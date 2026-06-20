@@ -1,27 +1,25 @@
+/**
+ * Render complete paginated services list inside specialized view container (.jobCards--full)
+ */
 export async function initInfoCardsFull(page = 1, limit = 6) {
-    let jobCardHolder = document.querySelector(".jobCards--full");
+    const jobCardHolder = document.querySelector(".jobCards--full");
     if (!jobCardHolder) return;
 
     try {
+        // Step 1: Resolve authenticated role values safely
         const roleResponse = await fetch('api/api-role.php');
         let userRole = 'Gost';
-
         if (roleResponse.ok) {
             const roleData = await roleResponse.json();
             userRole = roleData.role || 'Gost';
         }
 
-        console.log("Session verified user role:", userRole);
-
-        // Fetch your services data list
+        // Step 2: Fetch corresponding records
         const response = await fetch(`api/api-services.php?page=${page}&limit=${limit}`);
         if (!response.ok) throw new Error("Mrežni odziv nije ispravan.");
 
-        const rawText = await response.text();
-        const apiResponse = JSON.parse(rawText);
+        const apiResponse = await response.json();
         const servicesItems = apiResponse.items || [];
-        
-        // --- PAGINATION METADATA EXTRACTED HERE ---
         const metadata = apiResponse.metadata || { total_pages: 1, current_page: 1 };
 
         if (servicesItems.length === 0) {
@@ -32,11 +30,11 @@ export async function initInfoCardsFull(page = 1, limit = 6) {
         let cardsHtml = '';
         let tempRow = [];
 
-        // Dynamic layout processing loop
+        // Step 3: Loop items and map layout grids
         servicesItems.forEach((card, idx) => {
-            const cardBackground = "public/img/" + (card.bgi || "default.png");
-            const serviceId = card.id || card.ID || 0;
-
+            // Using localized quick thumbnails directory references here
+            const cardBackground = `public/img/thumbnails/${card.bgi || 'default.png'}`;
+            const serviceId = card.id || 0;
             let cardControls = '';
 
             if (userRole === 'Radnik') {
@@ -74,7 +72,7 @@ export async function initInfoCardsFull(page = 1, limit = 6) {
             }
         });
 
-        // --- DYNAMICALLY GENERATE PAGINATION HTML ---
+        // Step 4: Parse pagination controllers
         let paginationHtml = '';
         if (metadata.total_pages > 1) {
             paginationHtml += `
@@ -102,19 +100,16 @@ export async function initInfoCardsFull(page = 1, limit = 6) {
             `;
         }
 
-        // Combine cards and the pagination component together
         jobCardHolder.innerHTML = cardsHtml + paginationHtml;
 
-        // --- ATTACH EVENT LISTENERS TO THE PAGINATION BUTTONS ---
+        // Step 5: Assign interactive listeners cleanly
         document.querySelectorAll(".change-page-btn").forEach(button => {
             button.addEventListener("click", function(e) {
                 e.preventDefault();
                 const targetPage = parseInt(this.getAttribute("data-page"));
                 if (targetPage && targetPage !== metadata.current_page && targetPage >= 1 && targetPage <= metadata.total_pages) {
-                    // Re-run the function with the chosen page index number
                     initInfoCardsFull(targetPage, limit);
-                    // Smoothly scroll back to the top of the section
-                    document.querySelector(".jobCards--full").scrollIntoView({ behavior: 'smooth' });
+                    jobCardHolder.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         });

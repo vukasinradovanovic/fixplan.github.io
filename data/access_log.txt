@@ -171,3 +171,17 @@
 [2026-06-20 12:33:12] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
 [2026-06-20 12:33:20] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
 [2026-06-20 12:33:42] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 13:57:05] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 13:57:40] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 13:58:06] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 14:12:50] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 14:13:21] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-20 14:13:28] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-20 14:13:37] | IP: ::1 | Page: index.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:13:42] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:14:15] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:14:31] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:15:14] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:21:31] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:21:35] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)
+[2026-06-20 14:21:59] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 3 (milos@gmail.com)

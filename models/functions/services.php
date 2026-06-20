@@ -1,10 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config/connection.php';
 
-/**
- * Fetch all available categories for dropdown components
- * @return array
- */
 function getAllCategoriesFromDB() {
     global $conn;
     try {
@@ -16,15 +12,13 @@ function getAllCategoriesFromDB() {
     }
 }
 
-/**
- * Fetch a paginated chunk of services mapped alongside their parent category name
- */
 function getPaginatedServicesFromDB($limit, $offset) {
     global $conn;
     try {
-        $query = "SELECT s.id, s.name, s.slug, s.description, s.bgi, c.name AS category_name, s.category_id 
+        $query = "SELECT s.id, s.name, s.slug, s.description, img.filename AS bgi, c.name AS category_name, s.category_id, s.id_image 
                   FROM services s 
                   LEFT JOIN categories c ON s.category_id = c.id 
+                  LEFT JOIN service_images img ON s.id_image = img.id_image
                   ORDER BY s.id ASC LIMIT :limit OFFSET :offset";
         $stmt = $conn->prepare($query);
         
@@ -39,10 +33,6 @@ function getPaginatedServicesFromDB($limit, $offset) {
     }
 }
 
-/**
- * Get total count of services
- * @return int
- */
 function getTotalServicesCount() {
     global $conn;
     try {
@@ -54,13 +44,13 @@ function getTotalServicesCount() {
     }
 }
 
-/**
- * Fetch a single service alongside its category assignments
- */
 function getServiceByIdFromDB($id) {
     global $conn;
     try {
-        $query = "SELECT id, category_id, name, slug, description, bgi FROM services WHERE id = :id LIMIT 1";
+        $query = "SELECT s.id, s.category_id, s.name, s.slug, s.description, s.id_image, img.filename AS bgi 
+                  FROM services s
+                  LEFT JOIN service_images img ON s.id_image = img.id_image
+                  WHERE s.id = :id LIMIT 1";
         $stmt = $conn->prepare($query);
         $stmt->execute(['id' => (int)$id]);
         return $stmt->fetch();
@@ -71,43 +61,76 @@ function getServiceByIdFromDB($id) {
 }
 
 /**
- * Save a service record with dynamic category mappings and creator logging
+ * Persists image details and handles transactional relationships
  */
-function saveServiceToDB($name, $slug, $description, $bgi, $categoryId, $id = 0, $createdBy = null) {
+function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null) {
     global $conn;
     try {
+        $conn->beginTransaction();
         $categoryId = $categoryId > 0 ? (int)$categoryId : null;
+        $imageId = null;
 
+        // Step A: Handle structural assignments if a file token was processed
+        if (!empty($filename)) {
+            if ($id > 0) {
+                // If editing, check if an asset record exists
+                $existing = getServiceByIdFromDB($id);
+                $oldImageId = $existing ? ($existing['id_image'] ?? null) : null;
+                
+                if ($oldImageId) {
+                    $imgQuery = "UPDATE service_images SET filename = :filename WHERE id_image = :id_image";
+                    $conn->prepare($imgQuery)->execute(['filename' => $filename, 'id_image' => $oldImageId]);
+                    $imageId = $oldImageId;
+                }
+            }
+
+            if (!$imageId) {
+                $imgQuery = "INSERT INTO service_images (filename) VALUES (:filename)";
+                $stmt = $conn->prepare($imgQuery);
+                $stmt->execute(['filename' => $filename]);
+                $imageId = (int)$conn->lastInsertId();
+            }
+        } else if ($id > 0) {
+            // Keep existing image reference if no new file is provided during edit
+            $existing = getServiceByIdFromDB($id);
+            $imageId = $existing ? ($existing['id_image'] ?? null) : null;
+        }
+
+        // Step B: Persist service record alterations
         if ($id > 0) {
-            // Edit mode: Keep the original creator intact
             $query = "UPDATE services 
-                      SET category_id = :category_id, name = :name, slug = :slug, description = :description, bgi = :bgi 
+                      SET category_id = :category_id, id_image = :id_image, name = :name, slug = :slug, description = :description 
                       WHERE id = :id";
             $params = [
                 'category_id' => $categoryId,
+                'id_image'    => $imageId,
                 'name'        => $name,
                 'slug'        => $slug,
                 'description' => $description,
-                'bgi'         => $bgi,
                 'id'          => (int)$id
             ];
         } else {
-            // Insertion mode: Record the user adding the service
-            $query = "INSERT INTO services (category_id, name, slug, description, bgi, created_by) 
-                      VALUES (:category_id, :name, :slug, :description, :bgi, :created_by)";
+            $query = "INSERT INTO services (category_id, id_image, name, slug, description, created_by) 
+                      VALUES (:category_id, :id_image, :name, :slug, :description, :created_by)";
             $params = [
                 'category_id' => $categoryId,
+                'id_image'    => $imageId,
                 'name'        => $name,
                 'slug'        => $slug,
                 'description' => $description,
-                'bgi'         => $bgi,
                 'created_by'  => $createdBy ? (int)$createdBy : null
             ];
         }
 
         $stmt = $conn->prepare($query);
-        return $stmt->execute($params);
-    } catch (PDOException $e) {
+        $stmt->execute($params);
+        
+        $conn->commit();
+        return true;
+    } catch (Exception $e) {
+        if ($conn->inTransaction()) {
+            $conn->rollBack();
+        }
         error_log("Database error in saveServiceToDB: " . $e->getMessage());
         return false;
     }
