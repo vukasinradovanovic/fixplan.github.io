@@ -5,20 +5,19 @@
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
 
-            <?php 
-            // 1. Determine which control subview to render based on URL parameter
+            <?php
             $currentPage = isset($_GET['page']) ? trim($_GET['page']) : 'dashboard';
 
-            if ($currentPage === 'services'): 
-                // ==========================================
-                // VIEW LAYER: SERVICES MANAGEMENT PANEL
-                // ==========================================
+            if ($currentPage === 'services'):
+
                 include_once __DIR__ . '/services-control.php';
 
-            else: 
-                // ==========================================
-                // VIEW LAYER: DEFAULT ANALYTICS DASHBOARD
-                // ==========================================
+            elseif ($currentPage === 'faqs'):
+                
+                include_once __DIR__ . '/faq-control.php';
+
+            else:
+
             ?>
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Kontrolna Tabla</h1>

@@ -1,3 +1,7 @@
+<?php
+$currentSubPage = isset($_GET['page']) ? trim($_GET['page']) : 'dashboard';
+?>
+
 <nav class="col-md-3 col-lg-2 d-md-block bg-dark text-white p-3 collapse d-md-flex flex-column justify-content-between">
     <div>
         <a href="index.php" class="navbar-brand text-center d-block fs-3 fw-bold border-bottom border-secondary pb-3 mb-4 text-white text-decoration-none">
@@ -5,15 +9,26 @@
         </a>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item mb-2">
-                <a href="#" class="nav-link active bg-primary text-white">
+                <a href="admin-dashboard.php"
+                    class="nav-link <?= $currentSubPage === 'dashboard' ? 'active bg-primary text-white' : 'text-white-50 hover-link' ?>">
                     <i class="fa-solid fa-chart-line me-2"></i> Dashboard
                 </a>
             </li>
+
             <li class="nav-item mb-2">
-                <a href="admin-dashboard.php?page=services" class="nav-link text-white-50 hover-link">
+                <a href="admin-dashboard.php?page=services"
+                    class="nav-link <?= $currentSubPage === 'services' ? 'active bg-primary text-white' : 'text-white-50 hover-link' ?>">
                     <i class="fa-solid fa-screwdriver-wrench me-2"></i> Upravljanje Uslugama
                 </a>
             </li>
+
+            <li class="nav-item mb-2">
+                <a href="admin-dashboard.php?page=faqs" 
+                    class="nav-link <?= $currentSubPage === 'faqs' ? 'active bg-primary text-white' : 'text-white-50 hover-link' ?>">
+                    <i class="fa-solid fa-circle-question me-2"></i> Često Postavljana Pitanja (FAQ)
+                </a>
+            </li>
+
             <li class="nav-item mb-2">
                 <a href="index.php" class="nav-link text-white-50 hover-link">
                     <i class="fa-solid fa-house me-2"></i> Nazad na sajt
