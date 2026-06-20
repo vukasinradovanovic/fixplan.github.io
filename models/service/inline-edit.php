@@ -3,16 +3,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Load ONLY the raw DB helper utility layers directly to prevent accidental procedural code execution
 require_once __DIR__ . '/../functions/services.php';
+require_once __DIR__ . '/../functions/thumbnailGenerator.php';
+require_once __DIR__ . '/../functions/guards.php';
 
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Admin') {
-    header("Location: ../../index.php");
-    exit();
-}
+protectRoute(['Admin'], '../../index.php');
 
 /**
- * Isolated helper to generate clean SEO URLs on inline updates
+ * Generiše jedinstveni slug za uslugu na osnovu njenog imena, sa proverom u bazi podataka.
+ * @param string $title
+ * @param int $id
+ * @return string
  */
 function generateInlineSlugHelper($title, $id = 0) {
     $slug = iconv('UTF-8', 'ASCII//TRANSLIT', $title);
@@ -48,16 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // 1. Generate clean URL reference string safely
     $slug = generateInlineSlugHelper($name, $id);
 
-    // 2. Fetch existing service configuration to prevent erasing structural image parameters
     $existingService = getServiceByIdFromDB($id);
     $currentImageFilename = $existingService ? ($existingService['bgi'] ?? '') : '';
 
     $finalImageName = "";
 
-    // 3. Process structural file streams safely
     $imageFile = $_FILES['image'] ?? null;
     if ($imageFile && $imageFile['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath   = $imageFile['tmp_name'];
@@ -75,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!is_dir($thumbDir)) mkdir($thumbDir, 0755, true);
 
             if (move_uploaded_file($fileTmpPath, $origDir . $newFileName)) {
-                // Check if your environment handles thumbnail processing
                 if (function_exists('generateThumbnail')) {
                     generateThumbnail($origDir . $newFileName, $thumbDir . $newFileName, $fileExtension, 400);
                 } else {
@@ -84,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $finalImageName = $newFileName;
                 
-                // Clear old custom system assets safely
                 if (!empty($currentImageFilename) && $currentImageFilename !== 'default.png') {
                     if (file_exists($origDir . $currentImageFilename))  @unlink($origDir . $currentImageFilename);
                     if (file_exists($thumbDir . $currentImageFilename)) @unlink($thumbDir . $currentImageFilename);
@@ -93,12 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // FIX: If no new image was uploaded, retain the current filename to preserve the relation in saveServiceToDB
     if (empty($finalImageName)) {
         $finalImageName = $currentImageFilename;
     }
 
-    // 4. Update the DB record
     $isSaved = saveServiceToDB($name, $slug, $description, $finalImageName, $categoryId, $id, $_SESSION['user_id']);
 
     if ($isSaved) {
@@ -107,7 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['form_error_message'] = "Sistemska greška prilikom upisa izmena u bazu podataka.";
     }
 
-    // 5. Redirect straight back to your active dashboard module view pane
     header("Location: ../../admin-dashboard.php?page=services");
     exit();
 }

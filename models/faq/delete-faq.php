@@ -4,14 +4,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../../config/connection.php';
+require_once __DIR__ . '/../functions/guards.php';
 
-// Authorization Guard check
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Admin') {
-    header("Location: ../../index.php");
-    exit();
-}
+protectRoute(['Admin'], '../../index.php');
 
-// Ensure it is accessed via a GET parameter ID
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
@@ -20,10 +16,10 @@ if ($id <= 0) {
     exit();
 }
 
+// Pokušaj brisanja FAQ-a iz baze podataka
 try {
     global $conn;
     
-    // Execute targeted delete query
     $query = "DELETE FROM faqs WHERE id = :id LIMIT 1";
     $stmt = $conn->prepare($query);
     $isDeleted = $stmt->execute(['id' => $id]);
@@ -38,6 +34,5 @@ try {
     $_SESSION['form_error_message'] = "Internal database structural error handling deletion.";
 }
 
-// Redirect cleanly back onto the active FAQ workspace page view loop
 header("Location: ../../admin-dashboard.php?page=faqs");
 exit();

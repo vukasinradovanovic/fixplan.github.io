@@ -1,19 +1,30 @@
 <?php
 require_once __DIR__ . '/../functions/services.php';
+require_once __DIR__ . '/../functions/thumbnailGenerator.php';
+require_once __DIR__ . '/../functions/guards.php';
 
 /**
- * Automatically creates a unique, URL-safe slug from raw string titles
+ * Automatski generiše URL-friendly slug iz datog stringa, sa proverom jedinstvenosti u bazi podataka.
  * @param string $string
- * @param int $id Used to exclude current record during updates
+ * @param int $id Se koristi za izuzimanje trenutnog ID-a prilikom provere jedinstvenosti (za update slučajeve).
  * @return string
  */
-function generateBackendSlug($string, $id = 0) {
+function generateBackendSlug($string, $id = 0)
+{
     $matrix = [
-        'š'=>'s', 'đ'=>'dj', 'č'=>'c', 'ć'=>'c', 'ž'=>'z',
-        'Š'=>'S', 'Đ'=>'Dj', 'Č'=>'C', 'Ć'=>'C', 'Ž'=>'Z'
+        'š' => 's',
+        'đ' => 'dj',
+        'č' => 'c',
+        'ć' => 'c',
+        'ž' => 'z',
+        'Š' => 'S',
+        'Đ' => 'Dj',
+        'Č' => 'C',
+        'Ć' => 'C',
+        'Ž' => 'Z'
     ];
     $string = strtr($string, $matrix);
-    
+
     $slug = strtolower(trim($string));
     $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
     $slug = preg_replace('/[\s-]+/', '-', $slug);
@@ -21,8 +32,7 @@ function generateBackendSlug($string, $id = 0) {
 
     $baseSlug = $slug;
     $counter = 1;
-    
-    // Check uniqueness via DB helper
+
     while (isSlugExistsInDB($slug, $id)) {
         $slug = $baseSlug . '-' . $counter;
         $counter++;
@@ -32,7 +42,13 @@ function generateBackendSlug($string, $id = 0) {
 }
 
 /**
- * Process business logic mapping with pagination metadata, filtering, searching, and sorting
+ * Dohvata listu usluga sa paginacijom, filtriranjem po kategoriji, sortiranje i pretragu.
+ * @param int $page
+ * @param int $limit
+ * @param int|null $categoryId
+ * @param string $sort
+ * @param string|null $search
+ * @return array $formattedItems
  */
 function getServicesLogic($page = 1, $limit = 6, $categoryId = null, $sort = 'name_asc', $search = null)
 {
@@ -40,7 +56,6 @@ function getServicesLogic($page = 1, $limit = 6, $categoryId = null, $sort = 'na
     $limit  = max(1, (int)$limit);
     $offset = ($page - 1) * $limit;
 
-    // Fetch records and count based on criteria (Make sure your DB functions support the optional search param)
     $rawServices = getPaginatedServicesFromDB($limit, $offset, $categoryId, $sort, $search);
     $totalItems  = getTotalServicesCount($categoryId, $search);
     $totalPages  = ceil($totalItems / $limit);
@@ -68,7 +83,9 @@ function getServicesLogic($page = 1, $limit = 6, $categoryId = null, $sort = 'na
 }
 
 /**
- * Fetch form pre-population details safe wrapper
+ * Dohvata detalje o usluzi za prikaz u formi za uređivanje.
+ * @param int $id
+ * @return array|false
  */
 function getServiceFormDetails($id)
 {
@@ -76,7 +93,14 @@ function getServiceFormDetails($id)
 }
 
 /**
- * Process new service records & split images dynamically across public resource paths
+ * Obrađuje logiku za unos ili ažuriranje usluge, uključujući validaciju, obradu slike i upis u bazu podataka.
+ * @param string $name
+ * @param string $description
+ * @param array|null $imageFile
+ * @param int $categoryId
+ * @param int $id
+ * @param int|null $createdBy
+ * @return array ["success" => bool, "message" => string]
  */
 function processServiceSubmissionLogic($name, $description, $imageFile, $categoryId, $id = 0, $createdBy = null)
 {
@@ -143,57 +167,16 @@ function processServiceSubmissionLogic($name, $description, $imageFile, $categor
         : ["success" => false, "message" => "Greška prilikom upisa u bazu podataka."];
 }
 
-/**
- * Thumbnail processing engine helper
+
+/** 
+ * Obrada POST zahteva za unos ili ažuriranje usluge
  */
-function generateThumbnail($sourcePath, $destPath, $extension, $targetWidth = 400) {
-    list($origWidth, $origHeight) = getimagesize($sourcePath);
-    if (!$origWidth || !$origHeight) return false;
-
-    $targetHeight = round($targetWidth * ($origHeight / $origWidth));
-
-    switch ($extension) {
-        case 'jpeg':
-        case 'jpg':  $srcImage = imagecreatefromjpeg($sourcePath); break;
-        case 'png':  $srcImage = imagecreatefrompng($sourcePath);  break;
-        case 'webp': $srcImage = imagecreatefromwebp($sourcePath); break;
-        default:     return false;
-    }
-
-    if (!$srcImage) return false;
-
-    $thumbImage = imagecreatetruecolor($targetWidth, $targetHeight);
-
-    if ($extension === 'png' || $extension === 'webp') {
-        imagealphablending($thumbImage, false);
-        imagesavealpha($thumbImage, true);
-    }
-
-    imagecopyresampled($thumbImage, $srcImage, 0, 0, 0, 0, $targetWidth, $targetHeight, $origWidth, $origHeight);
-
-    switch ($extension) {
-        case 'jpeg':
-        case 'jpg':  $result = imagejpeg($thumbImage, $destPath, 85); break;
-        case 'png':  $result = imagepng($thumbImage, $destPath, 6);   break;
-        case 'webp': $result = imagewebp($thumbImage, $destPath, 80); break;
-        default:     $result = false;
-    }
-
-    imagedestroy($srcImage);
-    imagedestroy($thumbImage);
-    return $result;
-}
-
-// Controller interceptor listening routing layer
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Radnik') {
-        header("Location: ../../usluge.php");
-        exit();
-    }
+    protectRoute(['Radnik'], '../../index.php');
 
     $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
     $currentUserId = $_SESSION['user_id'] ?? null;

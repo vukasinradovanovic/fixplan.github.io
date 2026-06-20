@@ -4,12 +4,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . '/../../config/connection.php';
+require_once __DIR__ . '/../functions/guards.php';
 
-// Authorization Rule guard
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Admin') {
-    header("Location: ../../index.php");
-    exit();
-}
+protectRoute(['Admin'], '../../index.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $question     = trim($_POST['question'] ?? '');

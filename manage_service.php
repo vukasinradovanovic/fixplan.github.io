@@ -3,11 +3,9 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Security Boundary: Only 'Radnik' is allowed to execute CRUD operations
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'Radnik') {
-    header("Location: usluge.php");
-    exit();
-}
+require_once __DIR__ . '/models/functions/guards.php';
+
+protectRoute(['Radnik'], '/index.php');
 
 // Include your functions and models layer
 require_once __DIR__ . '/models/functions/services.php';

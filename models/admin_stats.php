@@ -1,7 +1,7 @@
 <?php
 /**
- * Parses access_log.txt to compile page visitation statistics
- * @return array Sorted array of page stats with hits and percentages
+ * Čitanje i analiza log fajla za statistiku poseta stranica.
+ * @return array 
  */
 function getPageStatsFromLog() {
     $logFilePath = dirname(__DIR__) . '/data/access_log.txt';
@@ -34,7 +34,6 @@ function getPageStatsFromLog() {
         arsort($stats);
     }
 
-    // Format the data with percentages
     $formattedStats = [];
     foreach ($stats as $page => $hits) {
         $percentage = $totalHits > 0 ? round(($hits / $totalHits) * 100, 1) : 0;

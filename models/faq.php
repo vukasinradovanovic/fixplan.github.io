@@ -2,8 +2,8 @@
 require_once dirname(__DIR__) . '/models/functions/faq.php';
 
 /**
- * Process and sanitize FAQ items for frontend delivery
- * @return array Formatted FAQ data list
+ * Logika za dobijanje FAQ podataka sa validacijom i formatiranjem.
+ * @return array Formatirani FAQ podaci
  */
 function getFAQLogic() {
     $rawFAQs = getAllFAQsFromDB();

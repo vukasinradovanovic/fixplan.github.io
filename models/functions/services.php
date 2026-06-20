@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../config/connection.php';
 
 /**
- * Fetch all available categories for dropdown components
+ * Dobija sve kategorije iz baze podataka.
  * @return array
  */
 function getAllCategoriesFromDB()
@@ -18,7 +18,12 @@ function getAllCategoriesFromDB()
 }
 
 /**
- * Fetch a paginated chunk of services filtered by category and sorted dynamically
+ * Dobija paginirane usluge iz baze podataka sa opcionalnim filtriranjem po kategoriji i sortiranjem.
+ * @param int $limit Broj usluga za prikaz
+ * @param int $offset Pomeraj za paginaciju
+ * @param int|null $categoryId ID kategorije za filtriranje
+ * @param string $sort Redosled sortiranja
+ * @return array Niz objekata usluga
  */
 function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort = 'name_asc')
 {
@@ -68,8 +73,9 @@ function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort =
 }
 
 /**
- * Get total relative count of services matching current filter definitions
- * @return int
+ * Dohvata ukupan broj usluga u bazi podataka, sa opcionalnim filtriranjem po kategoriji.
+ * @param int|null $categoryId
+ * @return int 
  */
 function getTotalServicesCount($categoryId = null)
 {
@@ -96,7 +102,9 @@ function getTotalServicesCount($categoryId = null)
 }
 
 /**
- * Fetch a single service alongside its image and category assignments
+ * Dohvata detalje o usluzi iz baze podataka po ID-u.
+ * @param int $id
+ * @return array|false Vraća asocijativni niz sa detaljima usluge ili false ako nije pronađena.
  */
 function getServiceByIdFromDB($id)
 {
@@ -116,7 +124,15 @@ function getServiceByIdFromDB($id)
 }
 
 /**
- * Save or modify service records atomically using isolated transactional layers
+ * Generiše jedinstveni slug za uslugu na osnovu njenog imena, sa proverom u bazi podataka.
+ * @param string $name
+ * @param string $slug
+ * @param string $description
+ * @param string $filename
+ * @param int $categoryId
+ * @param int $id
+ * @param int|null $createdBy
+ * @return bool Vraća true ako je uspešno sačuvano, false u suprotnom.
  */
 function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null)
 {
@@ -127,20 +143,17 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
         $id = (int)$id;
         $imageId = null;
 
-        // Dobavljanje postojeće slike ako radimo UPDATE
         if ($id > 0) {
             $existing = getServiceByIdFromDB($id);
             $imageId = $existing ? ($existing['id_image'] ?? null) : null;
         }
 
-        // Ako je poslata nova slika ili menjamo fajl
         if (!empty($filename) && ($existing ? $existing['bgi'] !== $filename : true)) {
             $imgQuery = "INSERT INTO service_images (filename) VALUES (:filename)";
             $imgStmt = $conn->prepare($imgQuery);
             $imgStmt->execute(['filename' => $filename]);
             $imageId = (int)$conn->lastInsertId();
         }
-        // Ako je $filename prosleđen ali je jednak starom, $imageId ostaje sačuvan i ne menja se u null!
 
         if ($id > 0) {
             $query = "UPDATE services 
@@ -182,7 +195,7 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
 }
 
 /**
- * Verifies if a given slug exists for another service record
+ * Proverava da li slug već postoji u bazi podataka, isključujući trenutni ID (za ažuriranje).
  * @param string $slug
  * @param int $excludeId
  * @return bool
@@ -200,6 +213,6 @@ function isSlugExistsInDB($slug, $excludeId = 0)
         return (int)$stmt->fetchColumn() > 0;
     } catch (PDOException $e) {
         error_log("Database error in isSlugExistsInDB: " . $e->getMessage());
-        return true; // Safe fallback to prevent duplicate execution errors
+        return true;
     }
 }
