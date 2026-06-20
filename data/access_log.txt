@@ -252,3 +252,17 @@
 [2026-06-20 20:25:03] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
 [2026-06-20 20:25:28] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
 [2026-06-20 20:25:38] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-20 20:40:17] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-20 20:40:27] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:54:04] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:56:40] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:56:49] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:57:04] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:57:08] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:57:15] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:57:32] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 20:57:48] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:06:07] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:07:44] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:10:11] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:13:51] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)

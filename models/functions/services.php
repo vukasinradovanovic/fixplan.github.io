@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../config/connection.php';
  * Fetch all available categories for dropdown components
  * @return array
  */
-function getAllCategoriesFromDB() {
+function getAllCategoriesFromDB()
+{
     global $conn;
     try {
         $query = "SELECT id, name, slug FROM categories ORDER BY name ASC";
@@ -19,36 +20,45 @@ function getAllCategoriesFromDB() {
 /**
  * Fetch a paginated chunk of services filtered by category and sorted dynamically
  */
-function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort = 'name_asc') {
+function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort = 'name_asc')
+{
     global $conn;
     try {
         $query = "SELECT s.id, s.name, s.slug, s.description, img.filename AS bgi, c.name AS category_name, s.category_id, s.id_image 
                   FROM services s 
                   LEFT JOIN categories c ON s.category_id = c.id 
                   LEFT JOIN service_images img ON s.id_image = img.id_image";
-        
+
         if ($categoryId !== null) {
             $query .= " WHERE s.category_id = :category_id";
         }
 
         switch ($sort) {
-            case 'name_desc': $query .= " ORDER BY s.name DESC"; break;
-            case 'date_desc': $query .= " ORDER BY s.id DESC";   break; 
-            case 'date_asc':  $query .= " ORDER BY s.id ASC";    break;
+            case 'name_desc':
+                $query .= " ORDER BY s.name DESC";
+                break;
+            case 'date_desc':
+                $query .= " ORDER BY s.id DESC";
+                break;
+            case 'date_asc':
+                $query .= " ORDER BY s.id ASC";
+                break;
             case 'name_asc':
-            default:          $query .= " ORDER BY s.name ASC";  break;
+            default:
+                $query .= " ORDER BY s.name ASC";
+                break;
         }
 
         $query .= " LIMIT :limit OFFSET :offset";
-        
+
         $stmt = $conn->prepare($query);
-        
+
         if ($categoryId !== null) {
             $stmt->bindValue(':category_id', (int)$categoryId, PDO::PARAM_INT);
         }
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
-        
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -61,11 +71,12 @@ function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort =
  * Get total relative count of services matching current filter definitions
  * @return int
  */
-function getTotalServicesCount($categoryId = null) {
+function getTotalServicesCount($categoryId = null)
+{
     global $conn;
     try {
         $query = "SELECT COUNT(*) FROM services";
-        
+
         if ($categoryId !== null) {
             $query .= " WHERE category_id = :category_id";
         }
@@ -87,7 +98,8 @@ function getTotalServicesCount($categoryId = null) {
 /**
  * Fetch a single service alongside its image and category assignments
  */
-function getServiceByIdFromDB($id) {
+function getServiceByIdFromDB($id)
+{
     global $conn;
     try {
         $query = "SELECT s.id, s.category_id, s.name, s.slug, s.description, s.id_image, img.filename AS bgi 
@@ -106,7 +118,8 @@ function getServiceByIdFromDB($id) {
 /**
  * Save or modify service records atomically using isolated transactional layers
  */
-function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null) {
+function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null)
+{
     global $conn;
     try {
         $conn->beginTransaction();
@@ -120,15 +133,14 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
             $imageId = $existing ? ($existing['id_image'] ?? null) : null;
         }
 
-        // Ako je poslata nova slika
-        if (!empty($filename)) {
-            // Umesto UPDATE-a nad zajedničkom tabelom slika, uvek ubacujemo novu sliku
-            // To sprečava prepisivanje iste slike ako više usluga deli podrazumevani ID
+        // Ako je poslata nova slika ili menjamo fajl
+        if (!empty($filename) && ($existing ? $existing['bgi'] !== $filename : true)) {
             $imgQuery = "INSERT INTO service_images (filename) VALUES (:filename)";
             $imgStmt = $conn->prepare($imgQuery);
             $imgStmt->execute(['filename' => $filename]);
             $imageId = (int)$conn->lastInsertId();
         }
+        // Ako je $filename prosleđen ali je jednak starom, $imageId ostaje sačuvan i ne menja se u null!
 
         if ($id > 0) {
             $query = "UPDATE services 
@@ -157,7 +169,7 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
 
         $stmt = $conn->prepare($query);
         $stmt->execute($params);
-        
+
         $conn->commit();
         return true;
     } catch (Exception $e) {
@@ -175,7 +187,8 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
  * @param int $excludeId
  * @return bool
  */
-function isSlugExistsInDB($slug, $excludeId = 0) {
+function isSlugExistsInDB($slug, $excludeId = 0)
+{
     global $conn;
     try {
         $query = "SELECT COUNT(*) FROM services WHERE slug = :slug AND id != :id";
