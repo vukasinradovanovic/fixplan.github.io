@@ -8,7 +8,9 @@
     overflow: hidden;
     color: $text_color_sec;
 
-    @include custom-box-shadow(); // primena mixina sa podrazumevanim promenljivim
+    @include custom-box-shadow(
+
+    ); // primena mixina sa podrazumevanim promenljivim
     @include img-filter-blur(); // primena mixina sa podrazumevanim promenljivim
 
     // Detaljan tekst (skriven inicijalno)
@@ -39,19 +41,21 @@
       color: $text_color_sec;
       background-color: $bg_color_sec;
       position: relative;
-      transition: opacity $transition, background-color $transition;
+      transition:
+        opacity $transition,
+        background-color $transition;
       @include translate-in(rem(50));
     }
 
     p,
-    button {
+    button,
+    &-admin {
       z-index: 3;
       position: relative;
       opacity: 0;
       transition: opacity $transition;
     }
 
-    // Hover efekat
     &:hover,
     &:focus-within {
       .jobCards_card-details {
@@ -64,7 +68,8 @@
         @include translate-reset();
       }
       p,
-      button {
+      button,
+      .jobCards_card-admin {
         opacity: 1;
       }
     }

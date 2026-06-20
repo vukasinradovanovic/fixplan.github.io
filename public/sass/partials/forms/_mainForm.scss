@@ -6,3 +6,12 @@
   @include custom-box-shadow(); // primena mixina sa podrazumevanim promenljivim
 
 }
+
+.mainFormCRUD {
+  min-height: rem(400);
+  background-color: $bg_color_white;
+  border: 1px solid $border_color;
+  padding: rem(12);
+  border-radius: $radius;
+  @include custom-box-shadow(); // primena mixina sa podrazumevanim promenljivim
+}

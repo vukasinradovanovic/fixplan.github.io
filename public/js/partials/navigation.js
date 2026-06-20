@@ -5,15 +5,15 @@ export function initNavigation() {
     let links = [                   //Linkovi i tekst za navigaciju
 
         {
-            slug: "index.html",
+            slug: "index.php",
             text: "Početna"
         },
         {
-            slug: "usluge.html",
+            slug: "usluge.php",
             text: "Usluge"
         },
         {
-            slug: "o_autoru.html",
+            slug: "o_autoru.php",
             text: "O autoru"
         }
     ];

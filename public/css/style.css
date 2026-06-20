@@ -181,7 +181,6 @@ a {
 .nav_socialIconsHolderItem {
   padding: 0.625rem 0.9375rem;
   font-weight: bold;
-  transition: color 0.3s ease, background-color 0.3s ease;
 }
 .nav_socialIconsHolderItem i {
   color: #fff;
@@ -189,6 +188,9 @@ a {
 }
 .nav_socialIconsHolderItem:hover i {
   color: #000;
+}
+.nav_socialIconsHolderItem {
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 .nav_socialIconsHolderItem:hover {
   color: #000;
@@ -256,7 +258,7 @@ a {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .jobCards_card p,
-.jobCards_card button {
+.jobCards_card button, .jobCards_card-admin {
   z-index: 3;
   position: relative;
   opacity: 0;
@@ -273,8 +275,10 @@ a {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .jobCards_card:hover p,
-.jobCards_card:hover button, .jobCards_card:focus-within p,
-.jobCards_card:focus-within button {
+.jobCards_card:hover button,
+.jobCards_card:hover .jobCards_card-admin, .jobCards_card:focus-within p,
+.jobCards_card:focus-within button,
+.jobCards_card:focus-within .jobCards_card-admin {
   opacity: 1;
 }
 
@@ -315,6 +319,15 @@ a {
 }
 
 .mainForm {
+  background-color: #fff;
+  border: 1px solid #00468B;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  box-shadow: 0.1875rem 0.3125rem 0.25rem rgba(0, 0, 0, 0.5);
+}
+
+.mainFormCRUD {
+  min-height: 25rem;
   background-color: #fff;
   border: 1px solid #00468B;
   padding: 0.75rem;
@@ -367,30 +380,24 @@ footer {
   padding: px-to-rem(3);
   list-style: none;
 }
-.footer_mainInfoHolderItemLink {
-  color: #fff;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-size: 0.9375rem;
-  transition: all 0.3s ease;
-  color: #fff;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-size: 0.9375rem;
-  transition: all 0.3s ease;
-  color: #fff;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-size: 0.9375rem;
-  transition: all 0.3s ease;
-}
 .footer_mainInfoHolderItemLink--location::before {
   display: inline-block;
   font-family: "FontAwesome";
   font-style: normal;
   content: "\f3c5";
 }
+.footer_mainInfoHolderItemLink {
+  color: #fff;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
 .footer_mainInfoHolderItemLink:hover {
   color: #000;
   background-color: #fff;
   border-radius: 0.375rem;
+}
+.footer_mainInfoHolderItemLink {
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
 }
 .footer_mainInfoHolderItemLinkText {
   padding: 0 1.25rem;
@@ -401,10 +408,18 @@ footer {
   font-style: normal;
   content: "\f0e0";
 }
+.footer_mainInfoHolderItemLink {
+  color: #fff;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
 .footer_mainInfoHolderItemLink:hover {
   color: #000;
   background-color: #fff;
   border-radius: 0.375rem;
+}
+.footer_mainInfoHolderItemLink {
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
 }
 .footer_mainInfoHolderItemLinkText {
   padding: 0 1.25rem;
@@ -415,10 +430,18 @@ footer {
   font-style: normal;
   content: "\f095";
 }
+.footer_mainInfoHolderItemLink {
+  color: #fff;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
 .footer_mainInfoHolderItemLink:hover {
   color: #000;
   background-color: #fff;
   border-radius: 0.375rem;
+}
+.footer_mainInfoHolderItemLink {
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
 }
 .footer_mainInfoHolderItemLinkText {
   padding: 0 1.25rem;
@@ -428,33 +451,25 @@ footer {
   padding: px-to-rem(12);
   list-style: none;
 }
-.footer_mainIconsHolderItemLink {
-  color: #fff;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-size: 1.5625rem;
-  padding: 0.625rem;
-  transition: all 0.3s ease;
-  color: #fff;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-size: 1.5625rem;
-  padding: 0.625rem;
-  transition: all 0.3s ease;
-  color: #fff;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  font-size: 1.5625rem;
-  padding: 0.625rem;
-  transition: all 0.3s ease;
-}
 .footer_mainIconsHolderItemLink--facebook::before {
   display: inline-block;
   font-family: "FontAwesome";
   font-style: normal;
   content: "\f09a";
 }
+.footer_mainIconsHolderItemLink {
+  color: #fff;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
 .footer_mainIconsHolderItemLink:hover {
   color: #000;
   background-color: transparent;
   border-radius: 0.375rem;
+}
+.footer_mainIconsHolderItemLink {
+  font-size: 1.5625rem;
+  padding: 0.625rem;
+  transition: all 0.3s ease;
 }
 .footer_mainIconsHolderItemLinkText {
   display: none;
@@ -466,10 +481,19 @@ footer {
   font-style: normal;
   content: "\f16d";
 }
+.footer_mainIconsHolderItemLink {
+  color: #fff;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
 .footer_mainIconsHolderItemLink:hover {
   color: #000;
   background-color: transparent;
   border-radius: 0.375rem;
+}
+.footer_mainIconsHolderItemLink {
+  font-size: 1.5625rem;
+  padding: 0.625rem;
+  transition: all 0.3s ease;
 }
 .footer_mainIconsHolderItemLinkText {
   display: none;
@@ -481,10 +505,19 @@ footer {
   font-style: normal;
   content: "\e61b";
 }
+.footer_mainIconsHolderItemLink {
+  color: #fff;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
 .footer_mainIconsHolderItemLink:hover {
   color: #000;
   background-color: transparent;
   border-radius: 0.375rem;
+}
+.footer_mainIconsHolderItemLink {
+  font-size: 1.5625rem;
+  padding: 0.625rem;
+  transition: all 0.3s ease;
 }
 .footer_mainIconsHolderItemLinkText {
   display: none;
