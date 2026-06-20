@@ -13,8 +13,12 @@
                 include_once __DIR__ . '/services-control.php';
 
             elseif ($currentPage === 'faqs'):
-                
+
                 include_once __DIR__ . '/faq-control.php';
+
+            elseif ($currentPage === 'add-faq'):
+               
+                include_once __DIR__ . '/faq-add-control.php';
 
             else:
 

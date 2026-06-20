@@ -269,3 +269,6 @@
 [2026-06-20 21:18:43] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
 [2026-06-20 21:26:14] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
 [2026-06-20 21:26:43] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:41:03] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:43:47] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
+[2026-06-20 21:47:12] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 4 (admin@example.com)
