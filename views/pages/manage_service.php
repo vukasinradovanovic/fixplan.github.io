@@ -10,24 +10,28 @@ if (!empty($_SESSION['form_error_message'])) {
     <div class="alert alert-danger"><?php echo $message; ?></div>
 <?php endif; ?>
 
-<div class="container" style="max-width: 600px;">
+<div class="container formContainer">
     <div class="mb-3">
-        <a href="usluge.php" class="text-decoration-none text-secondary"><i class="fa-solid fa-arrow-left me-1"></i> Nazad na usluge</a>
+        <a href="usluge.php" class="text-decoration-none text-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i> Nazad na usluge
+        </a>
     </div>
     
     <div class="mainFormCRUD p-4">
-        <h3 class="mb-4 text-center fw-bold text-dark"><?php echo $isEdit ? 'Izmeni Uslugu' : 'Dodaj Novu Uslugu'; ?></h3>
+        <h3 class="mb-4 text-center fw-bold text-dark">
+            <?= $isEdit ? 'Izmeni Uslugu' : 'Dodaj Novu Uslugu'; ?>
+        </h3>
         
         <?php if(!empty($message)): ?>
-            <div class="alert alert-danger"><?php echo $message; ?></div>
+            <div class="alert alert-danger"><?= $message; ?></div>
         <?php endif; ?>
 
-        <form action="models/service/service.php<?php echo $isEdit ? '?id='.$id : ''; ?>" method="POST" enctype="multipart/form-data">
+        <form action="models/service/service.php<?= $isEdit ? '?id='.$id : ''; ?>" method="POST" enctype="multipart/form-data">
             
             <div class="mb-3">
                 <label class="form-label small text-secondary fw-semibold">Izaberite Kategoriju</label>
                 <select class="form-select" name="category_id" required>
-                    <option value="" disabled <?php echo !$isEdit ? 'selected' : ''; ?>>-- Odaberite kategoriju --</option>
+                    <option value="" disabled <?= !$isEdit ? 'selected' : ''; ?>>-- Odaberite kategoriju --</option>
                     <?php if (!empty($allCategories) && is_array($allCategories)): ?>
                         <?php foreach ($allCategories as $cat): ?>
                             <?php 
@@ -35,8 +39,8 @@ if (!empty($_SESSION['form_error_message'])) {
                                 $catId   = $isArr ? ($cat['id'] ?? 0) : ($cat->id ?? 0);
                                 $catName = $isArr ? ($cat['name'] ?? '') : ($cat->name ?? '');
                             ?>
-                            <option value="<?php echo $catId; ?>" <?php echo ($currentCategoryId == $catId) ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($catName); ?>
+                            <option value="<?= $catId; ?>" <?= ($currentCategoryId == $catId) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($catName); ?>
                             </option>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -45,25 +49,22 @@ if (!empty($_SESSION['form_error_message'])) {
 
             <div class="mb-3">
                 <label class="form-label small text-secondary fw-semibold">Naziv Usluge</label>
-                <input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($name); ?>" required placeholder="npr. Krečenje zidova">
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label small text-secondary fw-semibold">Jedinstveni identifikator (Slug)</label>
-                <input type="text" class="form-control" name="slug" value="<?php echo htmlspecialchars($slug); ?>" required placeholder="npr. krecenije_zidova">
+                <input type="text" class="form-control" name="name" value="<?= htmlspecialchars($name); ?>" required placeholder="npr. Krečenje zidova">
             </div>
 
             <div class="mb-3">
                 <label class="form-label small text-secondary fw-semibold">Izaberite Sliku sa Uređaja</label>
-                <input type="file" class="form-control" name="image" <?php echo $isEdit ? '' : 'required'; ?> accept="image/*">
+                <input type="file" class="form-control" name="image" <?= $isEdit ? '' : 'required'; ?> accept="image/*">
                 <?php if ($isEdit && !empty($bgi)): ?>
-                    <div class="form-text text-muted mt-1">Trenutna slika: <code><?php echo htmlspecialchars($bgi); ?></code></div>
+                    <div class="form-text text-muted mt-1">
+                        Trenutna slika: <code><?= htmlspecialchars($bgi); ?></code>
+                    </div>
                 <?php endif; ?>
             </div>
 
             <div class="mb-4">
                 <label class="form-label small text-secondary fw-semibold">Opis Usluge</label>
-                <textarea class="form-control" name="description" rows="4" placeholder="Unesite detaljan opis građevinske usluge..."><?php echo htmlspecialchars($description); ?></textarea>
+                <textarea class="form-control" name="description" rows="4" placeholder="Unesite detaljan opis građevinske usluge..."><?= htmlspecialchars($description); ?></textarea>
             </div>
 
             <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">

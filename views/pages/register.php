@@ -1,10 +1,10 @@
-<div class="container my-5">
+<div class="container formContainer">
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card shadow-sm border-0 p-4">
         <div class="card-body">
-          <h2 class="card-title text-center mb-4 font-weight-bold nav_logoText" style="font-size: 2.5rem; color: #212529;">FixPlan</h2>
-          <h5 class="text-center text-muted mb-4">Kreirajte novi korisnički nalog</h5>
+          <h2 class="card-title text-center mb-5 font-weight-bold nav_logoText" style="font-size: 2.5rem; color: #212529;">FixPlan</h2>
+          <h5 class="text-center text-muted mb-5">Kreirajte novi korisnički nalog</h5>
           
           <?php if (!empty($message)): ?>
             <div class="alert <?php echo $messageClass; ?> py-2" role="alert">

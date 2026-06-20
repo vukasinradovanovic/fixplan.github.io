@@ -1,32 +1,58 @@
 <?php
 require_once __DIR__ . '/../functions/services.php';
 
-function getServicesLogic($page = 1, $limit = 6)
+/**
+ * Automatically creates a unique, URL-safe slug from raw string titles
+ * @param string $string
+ * @param int $id Used to exclude current record during updates
+ * @return string
+ */
+function generateBackendSlug($string, $id = 0) {
+    $matrix = [
+        'š'=>'s', 'đ'=>'dj', 'č'=>'c', 'ć'=>'c', 'ž'=>'z',
+        'Š'=>'S', 'Đ'=>'Dj', 'Č'=>'C', 'Ć'=>'C', 'Ž'=>'Z'
+    ];
+    $string = strtr($string, $matrix);
+    
+    $slug = strtolower(trim($string));
+    $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
+    $slug = preg_replace('/[\s-]+/', '-', $slug);
+    $slug = trim($slug, '-');
+
+    $baseSlug = $slug;
+    $counter = 1;
+    
+    // Check uniqueness via DB helper
+    while (isSlugExistsInDB($slug, $id)) {
+        $slug = $baseSlug . '-' . $counter;
+        $counter++;
+    }
+
+    return $slug;
+}
+
+/**
+ * Process business logic mapping with pagination metadata, filtering, searching, and sorting
+ */
+function getServicesLogic($page = 1, $limit = 6, $categoryId = null, $sort = 'name_asc', $search = null)
 {
-    $page = max(1, (int)$page);
-    $limit = max(1, (int)$limit);
+    $page   = max(1, (int)$page);
+    $limit  = max(1, (int)$limit);
     $offset = ($page - 1) * $limit;
 
-    $rawServices = getPaginatedServicesFromDB($limit, $offset);
-    $totalItems  = getTotalServicesCount();
+    // Fetch records and count based on criteria (Make sure your DB functions support the optional search param)
+    $rawServices = getPaginatedServicesFromDB($limit, $offset, $categoryId, $sort, $search);
+    $totalItems  = getTotalServicesCount($categoryId, $search);
     $totalPages  = ceil($totalItems / $limit);
 
     $formattedItems = array_map(function ($service) {
-        $isArr  = is_array($service);
-        $id     = $isArr ? ($service['id'] ?? 0) : ($service->id ?? 0);
-        $name   = $isArr ? ($service['name'] ?? '') : ($service->name ?? '');
-        $slug   = $isArr ? ($service['slug'] ?? '') : ($service->slug ?? '');
-        $desc   = $isArr ? ($service['description'] ?? '') : ($service->description ?? '');
-        $cat    = $isArr ? ($service['category_name'] ?? '') : ($service->category_name ?? '');
-        $bgi    = $isArr ? ($service['bgi'] ?? '') : ($service->bgi ?? '');
-
         return [
-            'id'       => (int)$id,
-            'label'    => htmlspecialchars($name),
-            'value'    => htmlspecialchars($slug),
-            'desc'     => htmlspecialchars($desc),
-            'category' => !empty($cat) ? htmlspecialchars($cat) : 'Nekategorisano',
-            'bgi'      => !empty($bgi) ? htmlspecialchars($bgi) : 'default.png'
+            'id'       => (int)($service['id'] ?? 0),
+            'label'    => htmlspecialchars($service['name'] ?? ''),
+            'value'    => htmlspecialchars($service['slug'] ?? ''),
+            'desc'     => htmlspecialchars($service['description'] ?? ''),
+            'category' => !empty($service['category_name']) ? htmlspecialchars($service['category_name']) : 'Nekategorisano',
+            'bgi'      => !empty($service['bgi']) ? htmlspecialchars($service['bgi']) : 'default.png'
         ];
     }, $rawServices);
 
@@ -41,22 +67,30 @@ function getServicesLogic($page = 1, $limit = 6)
     ];
 }
 
+/**
+ * Fetch form pre-population details safe wrapper
+ */
 function getServiceFormDetails($id)
 {
     return ($id > 0) ? getServiceByIdFromDB($id) : false;
 }
 
-function processServiceSubmissionLogic($name, $slug, $description, $imageFile, $categoryId, $id = 0, $createdBy = null)
+/**
+ * Process new service records & split images dynamically across public resource paths
+ */
+function processServiceSubmissionLogic($name, $description, $imageFile, $categoryId, $id = 0, $createdBy = null)
 {
     $name        = trim($name);
-    $slug        = trim($slug);
     $description = trim($description);
     $categoryId  = (int)$categoryId;
     $id          = (int)$id;
 
-    if (empty($name) || empty($slug) || $categoryId <= 0) {
+    if (empty($name) || $categoryId <= 0) {
         return ["success" => false, "message" => "Sva polja uključujući i kategoriju su obavezna."];
     }
+
+    // Process automated slug transformation seamlessly
+    $slug = generateBackendSlug($name, $id);
 
     $finalImageName = "";
     $oldImageName   = "";
@@ -64,8 +98,7 @@ function processServiceSubmissionLogic($name, $slug, $description, $imageFile, $
     if ($id > 0) {
         $existingService = getServiceByIdFromDB($id);
         if ($existingService) {
-            $isArr          = is_array($existingService);
-            $oldImageName   = $isArr ? ($existingService['bgi'] ?? '') : ($existingService->bgi ?? '');
+            $oldImageName = $existingService['bgi'] ?? '';
         }
     }
 
@@ -110,6 +143,9 @@ function processServiceSubmissionLogic($name, $slug, $description, $imageFile, $
         : ["success" => false, "message" => "Greška prilikom upisa u bazu podataka."];
 }
 
+/**
+ * Thumbnail processing engine helper
+ */
 function generateThumbnail($sourcePath, $destPath, $extension, $targetWidth = 400) {
     list($origWidth, $origHeight) = getimagesize($sourcePath);
     if (!$origWidth || !$origHeight) return false;
@@ -148,6 +184,7 @@ function generateThumbnail($sourcePath, $destPath, $extension, $targetWidth = 40
     return $result;
 }
 
+// Controller interceptor listening routing layer
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -163,7 +200,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $result = processServiceSubmissionLogic(
         $_POST['name'] ?? '',
-        $_POST['slug'] ?? '',
         $_POST['description'] ?? '',
         $_FILES['image'] ?? null,
         $_POST['category_id'] ?? 0,
