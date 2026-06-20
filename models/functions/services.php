@@ -2,10 +2,11 @@
 require_once __DIR__ . '/../../config/connection.php';
 
 /**
- * Fetch all available categories for dropdown components
+ * Dobija sve kategorije iz baze podataka.
  * @return array
  */
-function getAllCategoriesFromDB() {
+function getAllCategoriesFromDB()
+{
     global $conn;
     try {
         $query = "SELECT id, name, slug FROM categories ORDER BY name ASC";
@@ -17,38 +18,52 @@ function getAllCategoriesFromDB() {
 }
 
 /**
- * Fetch a paginated chunk of services filtered by category and sorted dynamically
+ * Dobija paginirane usluge iz baze podataka sa opcionalnim filtriranjem po kategoriji i sortiranjem.
+ * @param int $limit Broj usluga za prikaz
+ * @param int $offset Pomeraj za paginaciju
+ * @param int|null $categoryId ID kategorije za filtriranje
+ * @param string $sort Redosled sortiranja
+ * @return array Niz objekata usluga
  */
-function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort = 'name_asc') {
+function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort = 'name_asc')
+{
     global $conn;
     try {
         $query = "SELECT s.id, s.name, s.slug, s.description, img.filename AS bgi, c.name AS category_name, s.category_id, s.id_image 
                   FROM services s 
                   LEFT JOIN categories c ON s.category_id = c.id 
                   LEFT JOIN service_images img ON s.id_image = img.id_image";
-        
+
         if ($categoryId !== null) {
             $query .= " WHERE s.category_id = :category_id";
         }
 
         switch ($sort) {
-            case 'name_desc': $query .= " ORDER BY s.name DESC"; break;
-            case 'date_desc': $query .= " ORDER BY s.id DESC";   break; 
-            case 'date_asc':  $query .= " ORDER BY s.id ASC";    break;
+            case 'name_desc':
+                $query .= " ORDER BY s.name DESC";
+                break;
+            case 'date_desc':
+                $query .= " ORDER BY s.id DESC";
+                break;
+            case 'date_asc':
+                $query .= " ORDER BY s.id ASC";
+                break;
             case 'name_asc':
-            default:          $query .= " ORDER BY s.name ASC";  break;
+            default:
+                $query .= " ORDER BY s.name ASC";
+                break;
         }
 
         $query .= " LIMIT :limit OFFSET :offset";
-        
+
         $stmt = $conn->prepare($query);
-        
+
         if ($categoryId !== null) {
             $stmt->bindValue(':category_id', (int)$categoryId, PDO::PARAM_INT);
         }
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
-        
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -58,14 +73,16 @@ function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort =
 }
 
 /**
- * Get total relative count of services matching current filter definitions
- * @return int
+ * Dohvata ukupan broj usluga u bazi podataka, sa opcionalnim filtriranjem po kategoriji.
+ * @param int|null $categoryId
+ * @return int 
  */
-function getTotalServicesCount($categoryId = null) {
+function getTotalServicesCount($categoryId = null)
+{
     global $conn;
     try {
         $query = "SELECT COUNT(*) FROM services";
-        
+
         if ($categoryId !== null) {
             $query .= " WHERE category_id = :category_id";
         }
@@ -85,9 +102,12 @@ function getTotalServicesCount($categoryId = null) {
 }
 
 /**
- * Fetch a single service alongside its image and category assignments
+ * Dohvata detalje o usluzi iz baze podataka po ID-u.
+ * @param int $id
+ * @return array|false Vraća asocijativni niz sa detaljima usluge ili false ako nije pronađena.
  */
-function getServiceByIdFromDB($id) {
+function getServiceByIdFromDB($id)
+{
     global $conn;
     try {
         $query = "SELECT s.id, s.category_id, s.name, s.slug, s.description, s.id_image, img.filename AS bgi 
@@ -104,9 +124,18 @@ function getServiceByIdFromDB($id) {
 }
 
 /**
- * Save or modify service records atomically using isolated transactional layers
+ * Generiše jedinstveni slug za uslugu na osnovu njenog imena, sa proverom u bazi podataka.
+ * @param string $name
+ * @param string $slug
+ * @param string $description
+ * @param string $filename
+ * @param int $categoryId
+ * @param int $id
+ * @param int|null $createdBy
+ * @return bool Vraća true ako je uspešno sačuvano, false u suprotnom.
  */
-function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null) {
+function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null)
+{
     global $conn;
     try {
         $conn->beginTransaction();
@@ -114,16 +143,12 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
         $id = (int)$id;
         $imageId = null;
 
-        // Dobavljanje postojeće slike ako radimo UPDATE
         if ($id > 0) {
             $existing = getServiceByIdFromDB($id);
             $imageId = $existing ? ($existing['id_image'] ?? null) : null;
         }
 
-        // Ako je poslata nova slika
-        if (!empty($filename)) {
-            // Umesto UPDATE-a nad zajedničkom tabelom slika, uvek ubacujemo novu sliku
-            // To sprečava prepisivanje iste slike ako više usluga deli podrazumevani ID
+        if (!empty($filename) && ($existing ? $existing['bgi'] !== $filename : true)) {
             $imgQuery = "INSERT INTO service_images (filename) VALUES (:filename)";
             $imgStmt = $conn->prepare($imgQuery);
             $imgStmt->execute(['filename' => $filename]);
@@ -157,7 +182,7 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
 
         $stmt = $conn->prepare($query);
         $stmt->execute($params);
-        
+
         $conn->commit();
         return true;
     } catch (Exception $e) {
@@ -170,12 +195,13 @@ function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id
 }
 
 /**
- * Verifies if a given slug exists for another service record
+ * Proverava da li slug već postoji u bazi podataka, isključujući trenutni ID (za ažuriranje).
  * @param string $slug
  * @param int $excludeId
  * @return bool
  */
-function isSlugExistsInDB($slug, $excludeId = 0) {
+function isSlugExistsInDB($slug, $excludeId = 0)
+{
     global $conn;
     try {
         $query = "SELECT COUNT(*) FROM services WHERE slug = :slug AND id != :id";
@@ -187,6 +213,6 @@ function isSlugExistsInDB($slug, $excludeId = 0) {
         return (int)$stmt->fetchColumn() > 0;
     } catch (PDOException $e) {
         error_log("Database error in isSlugExistsInDB: " . $e->getMessage());
-        return true; // Safe fallback to prevent duplicate execution errors
+        return true;
     }
 }

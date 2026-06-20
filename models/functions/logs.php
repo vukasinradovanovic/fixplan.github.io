@@ -8,8 +8,8 @@ require_once __DIR__ . '/auth.php';
 
 
 /**
- * Captures current page and active user context data properties including roles
- * @return array Formatted log details
+ * Prikuplja trenutni kontekst pristupa korisnika za potrebe logovanja.
+ * @return array Asocijativni niz sa detaljima o korisniku, roli, stranici i IP adresi
  */
 function captureCurrentAccessContext() {
     $userIdentifier = "Gost";
@@ -19,7 +19,6 @@ function captureCurrentAccessContext() {
         $userId = $_SESSION['user_id'];
         $userIdentifier = "Korisnik ID: " . $userId . " (" . $_SESSION['email'] . ")";
         
-        // Dynamic lookup for the logged-in user's role name
         $userRole = getUserRoleNameFromDB($userId);
     }
 

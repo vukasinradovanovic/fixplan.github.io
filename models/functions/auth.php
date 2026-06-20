@@ -2,9 +2,9 @@
 require_once __DIR__ . '/../../config/connection.php';
 
 /**
- * Fetch a user profile by email address
+ * Dobija korisnički zapis iz baze podataka po email adresi.
  * @param string $email
- * @return object|bool Returns user object or false if not found
+ * @return object|bool Vraća korisnički objekat ili false ako nije pronađen.
  */
 function getUserByEmail($email) {
     global $conn;
@@ -15,19 +15,18 @@ function getUserByEmail($email) {
         $stmt->execute();
         return $stmt->fetch();
     } catch (PDOException $e) {
-        // Log error in production instead of breaking execution
         error_log("Database error in getUserByEmail: " . $e->getMessage());
         return false;
     }
 }
 
 /**
- * Insert a new record into the users table
+ * Ubacuje novog korisnika u bazu podataka sa hashiranom lozinkom.
  * @param string $firstName
  * @param string $lastName
  * @param string $email
  * @param string $passwordHashed
- * @return int|bool Returns inserted user ID or false on failure
+ * @return int|bool Vraća ID novog korisnika ili false ako nije uspešno.
  */
 function createUser($firstName, $lastName, $email, $passwordHashed) {
     global $conn;
@@ -51,9 +50,9 @@ function createUser($firstName, $lastName, $email, $passwordHashed) {
 }
 
 /**
- * Assign a security role profile link to a user
+ * Dodaje korisniku profilnu vezu za sigurnosnu ulogu
  * @param int $userId
- * @param int $roleId Default is 3 (Klijent)
+ * @param int $roleId podrazumevani 3 (Klijent)
  * @return bool
  */
 function assignUserRole($userId, $roleId = 3) {
@@ -71,7 +70,7 @@ function assignUserRole($userId, $roleId = 3) {
 }
 
 /**
- * Fetches the role name for a specific user ID from the database
+ * Dobija ime uloge korisnika iz baze podataka na osnovu ID-a korisnika.s
  * @param int $userId
  * @return string Role name (e.g., Admin, Klijent)
  */

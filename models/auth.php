@@ -2,7 +2,12 @@
 require_once dirname(__DIR__) . '/models/functions/auth.php';
 
 /**
- * Process User Registration Logic
+ * Logika za registraciju korisnika a validacijom i kreiranjem sesije.
+ * @param string $firstName
+ * @param string $lastName
+ * @param string $email
+ * @param string $password
+ * @return array 
  */
 function registerUserLogic($firstName, $lastName, $email, $password) {
     $firstName = trim(htmlspecialchars($firstName));
@@ -40,10 +45,12 @@ function registerUserLogic($firstName, $lastName, $email, $password) {
 }
 
 /**
- * Process User Authentication Sign In
+ * Logika za prijavu korisnika sa validacijom i kreiranjem sesije.
+ * @param string $email
+ * @param string $password
+ * @return array
  */
 function loginUserLogic($email, $password) {
-    // Clean up basic whitespace first
     $email = trim($email);
 
     if (empty($email) || empty($password)) {
@@ -61,15 +68,9 @@ function loginUserLogic($email, $password) {
         return ["success" => false, "message" => "Pogrešan email ili lozinka."];
     }
 
-    // Verify hash signatures match securely
     if (password_verify($password, $user->password)) {
-        
-        // Fetch the user's role name from the database dynamically
-        // Note: Make sure functions/logs.php is included where this is called, 
-        // or copy the getUserRoleNameFromDB helper function into your auth file!
         $userRole = getUserRoleNameFromDB($user->id);
 
-        // Instantiate session variables
         $_SESSION['user_id'] = $user->id;
         $_SESSION['first_name'] = $user->first_name;
         $_SESSION['last_name'] = $user->last_name;
@@ -83,7 +84,8 @@ function loginUserLogic($email, $password) {
 }
 
 /**
- * Clear Sessions state details (Logout action)
+ * Logika za odjavu korisnika i uništavanje sesije.
+ * @return bool
  */
 function logoutUserLogic() {
     if (session_status() == PHP_SESSION_NONE) {

@@ -2,7 +2,7 @@
 require_once dirname(__DIR__) . '/models/functions/logs.php';
 
 /**
- * Appends a structural tracking record line to the data text file logs
+ * Dodaje zapis o pristupu stranici u log fajl sa vremenskom oznakom, IP adresom, imenom stranice, ulogom korisnika i identitetom korisnika.
  * @return bool
  */
 function writePageAccessLog() {
