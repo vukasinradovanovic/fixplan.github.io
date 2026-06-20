@@ -1,20 +1,15 @@
+/**
+ * Render a simple non-paginated grid limiting previews to exactly 6 records for home layout (.jobCards)
+ */
 export async function initInfoCards() {
-    let jobCardHolder = document.querySelector(".jobCards");
-    if (!jobCardHolder) return; // Exit quickly if container doesn't exist on this page
+    const jobCardHolder = document.querySelector(".jobCards");
+    if (!jobCardHolder) return;
 
     try {
-        // Fetch values asynchronously from your local database JSON endpoint controller
         const response = await fetch("api/api-services.php");
-        const rawText = await response.text();
-        
-        if (!response.ok) {
-            console.error("Server Error Response:", rawText);
-            throw new Error("Mrežni odziv nije ispravan.");
-        }
+        if (!response.ok) throw new Error("Mrežni odziv nije ispravan.");
 
-        const apiResponse = JSON.parse(rawText);
-        
-        // FIX: Extract the items array from the object payload safely, fallback to an empty array
+        const apiResponse = await response.json();
         const servicesArray = apiResponse.items || [];
 
         if (servicesArray.length === 0) {
@@ -24,13 +19,11 @@ export async function initInfoCards() {
 
         let html = '';
         let tempRow = [];
-
-        // Slice the array safely to restrict output to a maximum of 6 elements for the home layout
         const limitedServices = servicesArray.slice(0, 6);
 
         limitedServices.forEach((card, idx) => {
-            // Properly declared dynamic background paths pointing to your local asset directory
-            const cardBackground = "public/img/" + (card.bgi || "default.png");
+            // Pointing directly to optimized thumbnails subfolder
+            const cardBackground = `public/img/thumbnails/${card.bgi || 'default.png'}`;
             
             tempRow.push(`
                 <div class="col-12 col-md-6 col-lg-4 d-flex align-items-stretch mb-4">
@@ -51,7 +44,7 @@ export async function initInfoCards() {
         jobCardHolder.innerHTML = html;
 
     } catch (error) {
-        console.error("Detaljna greška:", error);
+        console.error("Detaljna greška u initInfoCards:", error);
         jobCardHolder.innerHTML = `<div class="alert alert-danger w-50 mx-auto" role="alert">Trenutno nije moguće učitati usluge.</div>`;
     }
 }

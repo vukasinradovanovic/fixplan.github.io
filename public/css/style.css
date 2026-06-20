@@ -335,6 +335,11 @@ a {
   box-shadow: 0.1875rem 0.3125rem 0.25rem rgba(0, 0, 0, 0.5);
 }
 
+.formContainer {
+  margin-top: 3.125rem;
+  margin-bottom: 4.6875rem;
+}
+
 .faq-section {
   text-align: start;
 }

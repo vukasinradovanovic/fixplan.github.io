@@ -1,42 +1,47 @@
+/**
+ * Render complete filtered and sorted paginated services list
+ */
 export async function initInfoCardsFull(page = 1, limit = 6) {
-    let jobCardHolder = document.querySelector(".jobCards--full");
+    const jobCardHolder = document.querySelector(".jobCards--full");
     if (!jobCardHolder) return;
 
+    // Track active DOM configurations
+    const filterCategory = document.getElementById("filterCategory");
+    const sortServices = document.getElementById("sortServices");
+
+    const categoryId = filterCategory ? filterCategory.value : "";
+    const sortOrder = sortServices ? sortServices.value : "name_asc";
+
     try {
+        // Step 1: Resolve authenticated role values safely
         const roleResponse = await fetch('api/api-role.php');
         let userRole = 'Gost';
-
         if (roleResponse.ok) {
             const roleData = await roleResponse.json();
             userRole = roleData.role || 'Gost';
         }
 
-        console.log("Session verified user role:", userRole);
-
-        // Fetch your services data list
-        const response = await fetch(`api/api-services.php?page=${page}&limit=${limit}`);
+        // Step 2: Fetch corresponding records with filters and sorting parameters
+        const url = `api/api-services.php?page=${page}&limit=${limit}&category_id=${categoryId}&sort=${sortOrder}`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error("Mrežni odziv nije ispravan.");
 
-        const rawText = await response.text();
-        const apiResponse = JSON.parse(rawText);
+        const apiResponse = await response.json();
         const servicesItems = apiResponse.items || [];
-        
-        // --- PAGINATION METADATA EXTRACTED HERE ---
         const metadata = apiResponse.metadata || { total_pages: 1, current_page: 1 };
 
         if (servicesItems.length === 0) {
-            jobCardHolder.innerHTML = `<div class="alert alert-info w-50 mx-auto">Nema dostupnih usluga.</div>`;
+            jobCardHolder.innerHTML = `<div class="alert alert-info w-50 mx-auto">Nema dostupnih usluga za izabrane kriterijume.</div>`;
             return;
         }
 
         let cardsHtml = '';
         let tempRow = [];
 
-        // Dynamic layout processing loop
+        // Step 3: Loop items and map layout grids
         servicesItems.forEach((card, idx) => {
-            const cardBackground = "public/img/" + (card.bgi || "default.png");
-            const serviceId = card.id || card.ID || 0;
-
+            const cardBackground = `public/img/thumbnails/${card.bgi || 'default.png'}`;
+            const serviceId = card.id || 0;
             let cardControls = '';
 
             if (userRole === 'Radnik') {
@@ -74,7 +79,7 @@ export async function initInfoCardsFull(page = 1, limit = 6) {
             }
         });
 
-        // --- DYNAMICALLY GENERATE PAGINATION HTML ---
+        // Step 4: Parse pagination controllers
         let paginationHtml = '';
         if (metadata.total_pages > 1) {
             paginationHtml += `
@@ -102,19 +107,16 @@ export async function initInfoCardsFull(page = 1, limit = 6) {
             `;
         }
 
-        // Combine cards and the pagination component together
         jobCardHolder.innerHTML = cardsHtml + paginationHtml;
 
-        // --- ATTACH EVENT LISTENERS TO THE PAGINATION BUTTONS ---
+        // Step 5: Assign interactive listeners cleanly to pagination items
         document.querySelectorAll(".change-page-btn").forEach(button => {
-            button.addEventListener("click", function(e) {
+            button.addEventListener("click", function (e) {
                 e.preventDefault();
                 const targetPage = parseInt(this.getAttribute("data-page"));
                 if (targetPage && targetPage !== metadata.current_page && targetPage >= 1 && targetPage <= metadata.total_pages) {
-                    // Re-run the function with the chosen page index number
                     initInfoCardsFull(targetPage, limit);
-                    // Smoothly scroll back to the top of the section
-                    document.querySelector(".jobCards--full").scrollIntoView({ behavior: 'smooth' });
+                    jobCardHolder.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         });
@@ -123,3 +125,16 @@ export async function initInfoCardsFull(page = 1, limit = 6) {
         console.error("Detaljna greška u initInfoCardsFull:", error);
     }
 }
+
+// --- ATTACH EVENT LISTENERS TO FILTER AND SORT DROPDOWNS ONCE DOM IS READY ---
+document.addEventListener("DOMContentLoaded", () => {
+    const filterCategory = document.getElementById("filterCategory");
+    const sortServices = document.getElementById("sortServices");
+
+    if (filterCategory && sortServices) {
+        const triggerReload = () => initInfoCardsFull(1, 6); // Force reset view to page 1
+
+        filterCategory.addEventListener("change", triggerReload);
+        sortServices.addEventListener("change", triggerReload);
+    }
+});

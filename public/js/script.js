@@ -10,7 +10,7 @@ import { initNavigation } from "./partials/navigation.js";
 
 // Loader - jQuery
 $(document).ready(function () {
-    initMainLoader();
+    initMainLoader(); // Set to false to skip loader and show content immediately
 });
 
 

@@ -9,7 +9,7 @@ function getAllCategoriesFromDB() {
     global $conn;
     try {
         $query = "SELECT id, name, slug FROM categories ORDER BY name ASC";
-        return $conn->query($query)->fetchAll();
+        return $conn->query($query)->fetchAll(PDO::FETCH_ASSOC); // Eksplicitno vraća asocijativni niz
     } catch (PDOException $e) {
         error_log("Database error in getAllCategoriesFromDB: " . $e->getMessage());
         return [];
@@ -17,22 +17,40 @@ function getAllCategoriesFromDB() {
 }
 
 /**
- * Fetch a paginated chunk of services mapped alongside their parent category name
+ * Fetch a paginated chunk of services filtered by category and sorted dynamically
  */
-function getPaginatedServicesFromDB($limit, $offset) {
+function getPaginatedServicesFromDB($limit, $offset, $categoryId = null, $sort = 'name_asc') {
     global $conn;
     try {
-        $query = "SELECT s.id, s.name, s.slug, s.description, s.bgi, c.name AS category_name, s.category_id 
+        $query = "SELECT s.id, s.name, s.slug, s.description, img.filename AS bgi, c.name AS category_name, s.category_id, s.id_image 
                   FROM services s 
                   LEFT JOIN categories c ON s.category_id = c.id 
-                  ORDER BY s.id ASC LIMIT :limit OFFSET :offset";
+                  LEFT JOIN service_images img ON s.id_image = img.id_image";
+        
+        if ($categoryId !== null) {
+            $query .= " WHERE s.category_id = :category_id";
+        }
+
+        switch ($sort) {
+            case 'name_desc': $query .= " ORDER BY s.name DESC"; break;
+            case 'date_desc': $query .= " ORDER BY s.id DESC";   break; 
+            case 'date_asc':  $query .= " ORDER BY s.id ASC";    break;
+            case 'name_asc':
+            default:          $query .= " ORDER BY s.name ASC";  break;
+        }
+
+        $query .= " LIMIT :limit OFFSET :offset";
+        
         $stmt = $conn->prepare($query);
         
+        if ($categoryId !== null) {
+            $stmt->bindValue(':category_id', (int)$categoryId, PDO::PARAM_INT);
+        }
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Database error in getPaginatedServicesFromDB: " . $e->getMessage());
         return [];
@@ -40,14 +58,26 @@ function getPaginatedServicesFromDB($limit, $offset) {
 }
 
 /**
- * Get total count of services
+ * Get total relative count of services matching current filter definitions
  * @return int
  */
-function getTotalServicesCount() {
+function getTotalServicesCount($categoryId = null) {
     global $conn;
     try {
         $query = "SELECT COUNT(*) FROM services";
-        return (int)$conn->query($query)->fetchColumn();
+        
+        if ($categoryId !== null) {
+            $query .= " WHERE category_id = :category_id";
+        }
+
+        $stmt = $conn->prepare($query);
+        if ($categoryId !== null) {
+            $stmt->execute(['category_id' => (int)$categoryId]);
+        } else {
+            $stmt->execute();
+        }
+
+        return (int)$stmt->fetchColumn();
     } catch (PDOException $e) {
         error_log("Database error in getTotalServicesCount: " . $e->getMessage());
         return 0;
@@ -55,15 +85,18 @@ function getTotalServicesCount() {
 }
 
 /**
- * Fetch a single service alongside its category assignments
+ * Fetch a single service alongside its image and category assignments
  */
 function getServiceByIdFromDB($id) {
     global $conn;
     try {
-        $query = "SELECT id, category_id, name, slug, description, bgi FROM services WHERE id = :id LIMIT 1";
+        $query = "SELECT s.id, s.category_id, s.name, s.slug, s.description, s.id_image, img.filename AS bgi 
+                  FROM services s
+                  LEFT JOIN service_images img ON s.id_image = img.id_image
+                  WHERE s.id = :id LIMIT 1";
         $stmt = $conn->prepare($query);
         $stmt->execute(['id' => (int)$id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Database error in getServiceByIdFromDB: " . $e->getMessage());
         return false;
@@ -71,44 +104,89 @@ function getServiceByIdFromDB($id) {
 }
 
 /**
- * Save a service record with dynamic category mappings and creator logging
+ * Save or modify service records atomically using isolated transactional layers
  */
-function saveServiceToDB($name, $slug, $description, $bgi, $categoryId, $id = 0, $createdBy = null) {
+function saveServiceToDB($name, $slug, $description, $filename, $categoryId, $id = 0, $createdBy = null) {
     global $conn;
     try {
+        $conn->beginTransaction();
         $categoryId = $categoryId > 0 ? (int)$categoryId : null;
+        $id = (int)$id;
+        $imageId = null;
+
+        // Dobavljanje postojeće slike ako radimo UPDATE
+        if ($id > 0) {
+            $existing = getServiceByIdFromDB($id);
+            $imageId = $existing ? ($existing['id_image'] ?? null) : null;
+        }
+
+        // Ako je poslata nova slika
+        if (!empty($filename)) {
+            // Umesto UPDATE-a nad zajedničkom tabelom slika, uvek ubacujemo novu sliku
+            // To sprečava prepisivanje iste slike ako više usluga deli podrazumevani ID
+            $imgQuery = "INSERT INTO service_images (filename) VALUES (:filename)";
+            $imgStmt = $conn->prepare($imgQuery);
+            $imgStmt->execute(['filename' => $filename]);
+            $imageId = (int)$conn->lastInsertId();
+        }
 
         if ($id > 0) {
-            // Edit mode: Keep the original creator intact
             $query = "UPDATE services 
-                      SET category_id = :category_id, name = :name, slug = :slug, description = :description, bgi = :bgi 
+                      SET category_id = :category_id, id_image = :id_image, name = :name, slug = :slug, description = :description 
                       WHERE id = :id";
             $params = [
                 'category_id' => $categoryId,
+                'id_image'    => $imageId,
                 'name'        => $name,
                 'slug'        => $slug,
                 'description' => $description,
-                'bgi'         => $bgi,
-                'id'          => (int)$id
+                'id'          => $id
             ];
         } else {
-            // Insertion mode: Record the user adding the service
-            $query = "INSERT INTO services (category_id, name, slug, description, bgi, created_by) 
-                      VALUES (:category_id, :name, :slug, :description, :bgi, :created_by)";
+            $query = "INSERT INTO services (category_id, id_image, name, slug, description, created_by) 
+                      VALUES (:category_id, :id_image, :name, :slug, :description, :created_by)";
             $params = [
                 'category_id' => $categoryId,
+                'id_image'    => $imageId,
                 'name'        => $name,
                 'slug'        => $slug,
                 'description' => $description,
-                'bgi'         => $bgi,
                 'created_by'  => $createdBy ? (int)$createdBy : null
             ];
         }
 
         $stmt = $conn->prepare($query);
-        return $stmt->execute($params);
-    } catch (PDOException $e) {
+        $stmt->execute($params);
+        
+        $conn->commit();
+        return true;
+    } catch (Exception $e) {
+        if ($conn->inTransaction()) {
+            $conn->rollBack();
+        }
         error_log("Database error in saveServiceToDB: " . $e->getMessage());
         return false;
+    }
+}
+
+/**
+ * Verifies if a given slug exists for another service record
+ * @param string $slug
+ * @param int $excludeId
+ * @return bool
+ */
+function isSlugExistsInDB($slug, $excludeId = 0) {
+    global $conn;
+    try {
+        $query = "SELECT COUNT(*) FROM services WHERE slug = :slug AND id != :id";
+        $stmt = $conn->prepare($query);
+        $stmt->execute([
+            'slug' => $slug,
+            'id'   => (int)$excludeId
+        ]);
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (PDOException $e) {
+        error_log("Database error in isSlugExistsInDB: " . $e->getMessage());
+        return true; // Safe fallback to prevent duplicate execution errors
     }
 }

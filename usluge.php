@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 // Set layout settings dynamically
 $pageTitle = "Usluge"; 
 
