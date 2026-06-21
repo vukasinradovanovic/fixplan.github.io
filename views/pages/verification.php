@@ -1,4 +1,4 @@
-<div class="container mt-5">
+<div class="container mt-5" style="min-height: 65vh;">
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
             <div class="card p-4 shadow-sm border-0">
