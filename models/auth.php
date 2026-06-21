@@ -1,6 +1,8 @@
 <?php
-require_once dirname(__DIR__) . '/models/functions/auth.php';
-require_once dirname(__DIR__) . '/models/functions/mailer.php';
+// models/services/auth-service.php
+
+require_once dirname(__DIR__, 1) . '/models/functions/auth.php';
+require_once dirname(__DIR__, 1) . '/models/functions/mailer.php';
 
 /**
  * Pomoćna funkcija za validaciju email formata i dozvoljenih domena.
@@ -129,60 +131,4 @@ function logoutUserLogic() {
     $_SESSION = array();
     session_destroy();
     return true;
-}
-
-/**
- * Bilježi neuspešan pokušaj prijave u bazu podataka.
- * @param string $email
- * @param string $ipAddress
- * @return void
- */
-function logFailedAttempt($email, $ipAddress) {
-    global $conn;
-    $stmt = $conn->prepare("INSERT INTO login_attempts (email, ip_address) VALUES (:email, :ip_address)");
-    $stmt->execute(['email' => $email, 'ip_address' => $ipAddress]);
-}
-
-/**
- * Broji neuspešne pokušaje za određenog korisnika u poslednjih 5 minuta.
- * @param string $email
- * @return int
- */
-function countRecentFailures($email): int {
-    global $conn;
-    $stmt = $conn->prepare("
-        SELECT COUNT(*) FROM login_attempts 
-        WHERE email = :email 
-        AND attempted_at >= NOW() - INTERVAL 5 MINUTE
-    ");
-    $stmt->execute(['email' => $email]);
-    return (int)$stmt->fetchColumn();
-}
-
-/**
- * Zaključava korisnički nalog u bazi podataka.
- * @param string $email
- * @return bool 
- */
-function lockUserAccount($email): bool {
-    global $conn;
-    $stmt = $conn->prepare("UPDATE users SET is_locked = 1 WHERE email = :email");
-    return $stmt->execute(['email' => $email]);
-}
-
-/**
- * Dohvata sve registrovane korisnike sortirane od najnovijih ka starijima.
- * @return array Niz asocijativnih nizova sa podacima korisnika ili prazan niz u slučaju greške.
- */
-function getAllUsersFromDB() {
-    global $conn;
-    try {
-        $query = "SELECT id, first_name, last_name, email, is_locked, is_verified, status 
-                  FROM users 
-                  ORDER BY id DESC";
-        return $conn->query($query)->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        error_log("Database error in getAllUsersFromDB: " . $e->getMessage());
-        return [];
-    }
 }

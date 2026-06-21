@@ -2,6 +2,7 @@
 require_once dirname(__DIR__, 2) . '/models/auth.php';
 
 $usersList = getAllUsersFromDB();
+$allRoles  = getAllRolesFromDB();
 ?>
 
 <?php if (!empty($_SESSION['form_success_message'])): ?>
@@ -21,7 +22,7 @@ $usersList = getAllUsersFromDB();
 <div class="card border-0 shadow-sm mx-4 mt-4">
     <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0 fw-bold text-dark">
-            <i class="fa-solid fa-users me-2 text-primary"></i> Upravljanje Korisnicima
+            <i class="fa-solid fa-users me-2 text-primary"></i> User Management Panel
         </h5>
     </div>
     
@@ -30,55 +31,66 @@ $usersList = getAllUsersFromDB();
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light text-nowrap">
                     <tr>
-                        <th class="ps-4" style="width: 20%;">Ime</th>
-                        <th style="width: 20%;">Prezime</th>
-                        <th style="width: 25%;">Email Adresa</th>
-                        <th style="width: 13%;">Status Verifikacije</th>
-                        <th style="width: 12%;">Nalog Zaključan</th>
-                        <th class="pe-4 text-end" style="width: 10%;">Akcije</th>
+                        <th class="ps-4" style="width: 15%;">First Name</th>
+                        <th style="width: 15%;">Last Name</th>
+                        <th style="width: 23%;">Email Address</th>
+                        <th style="width: 15%;">Account Role</th>
+                        <th style="width: 12%;">Verification</th>
+                        <th style="width: 10%;">Locked Status</th>
+                        <th class="pe-4 text-end" style="width: 10%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($usersList)): ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">Trenutno nema registrovanih korisnika.</td>
+                            <td colspan="7" class="text-center py-4 text-muted">No registered users located inside the system database.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($usersList as $user): ?>
                             <tr>
-                                <td colspan="6" class="p-0 border-0">
+                                <td colspan="7" class="p-0 border-0">
                                     <form action="models/user/inline-edit.php?id=<?= $user['id']; ?>" method="POST" class="m-0">
                                         <table class="table align-middle m-0" style="table-layout: fixed; width: 100%;">
                                             <tr>
-                                                <td class="ps-4" style="width: 20%;">
+                                                <td class="ps-4" style="width: 15%;">
                                                     <input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name']); ?>" class="form-control form-control-sm fw-bold text-dark" required>
                                                 </td>
 
-                                                <td style="width: 20%;">
+                                                <td style="width: 15%;">
                                                     <input type="text" name="last_name" value="<?= htmlspecialchars($user['last_name']); ?>" class="form-control form-control-sm fw-bold text-dark" required>
                                                 </td>
 
-                                                <td style="width: 25%;">
+                                                <td style="width: 23%;">
                                                     <input type="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" class="form-control form-control-sm text-secondary" required>
                                                 </td>
 
-                                                <td style="width: 13%;">
-                                                    <select name="is_verified" class="form-select form-select-sm text-dark fw-medium" required>
-                                                        <option value="1" <?= (int)$user['is_verified'] === 1 ? 'selected' : ''; ?>>Verifikovan</option>
-                                                        <option value="0" <?= (int)$user['is_verified'] === 0 ? 'selected' : ''; ?>>Nije Verifikovan</option>
+                                                <td style="width: 15%;">
+                                                    <select name="role_id" class="form-select form-select-sm text-dark fw-bold" required>
+                                                        <?php foreach ($allRoles as $role): ?>
+                                                            <option value="<?= $role['id']; ?>" <?= (int)$user['role_id'] === (int)$role['id'] ? 'selected' : ''; ?>>
+                                                                <?= htmlspecialchars($role['name']); ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
                                                     </select>
                                                 </td>
 
                                                 <td style="width: 12%;">
+                                                    <select name="is_verified" class="form-select form-select-sm text-dark fw-medium" required>
+                                                        <option value="1" <?= (int)$user['is_verified'] === 1 ? 'selected' : ''; ?>>Verified</option>
+                                                        <option value="0" <?= (int)$user['is_verified'] === 0 ? 'selected' : ''; ?>>Unverified</option>
+                                                    </select>
+                                                </td>
+
+                                                <td style="width: 10%;">
                                                     <select name="is_locked" class="form-select form-select-sm text-dark fw-medium" required>
-                                                        <option value="0" <?= (int)$user['is_locked'] === 0 ? 'selected' : ''; ?>>Ne (Aktivan)</option>
-                                                        <option value="1" <?= (int)$user['is_locked'] === 1 ? 'selected' : ''; ?>>Da (Zaključan)</option>
+                                                        <option value="0" <?= (int)$user['is_locked'] === 0 ? 'selected' : ''; ?>>Active</option>
+                                                        <option value="1" <?= (int)$user['is_locked'] === 1 ? 'selected' : ''; ?>>Locked</option>
                                                     </select>
                                                 </td>
 
                                                 <td class="pe-4 text-end" style="width: 10%;">
                                                     <div class="d-inline-flex gap-1">
-                                                        <button type="submit" class="btn btn-sm btn-primary px-2 shadow-sm" title="Sačuvaj izmene">
+                                                        <button type="submit" class="btn btn-sm btn-primary px-2 shadow-sm" title="Save Modifications">
                                                             <i class="fa-solid fa-floppy-disk"></i>
                                                         </button>
                                                     </div>
