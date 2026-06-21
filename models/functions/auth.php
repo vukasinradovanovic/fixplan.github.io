@@ -21,23 +21,25 @@ function getUserByEmail($email) {
 }
 
 /**
- * Ubacuje novog korisnika u bazu podataka sa hashiranom lozinkom.
+ * Ubacuje novog korisnika u bazu podataka sa hashiranom lozinkom i verifikacionim tokenom.
  * @param string $firstName
  * @param string $lastName
  * @param string $email
  * @param string $passwordHashed
+ * @param string $verificationToken
  * @return int|bool Vraća ID novog korisnika ili false ako nije uspešno.
  */
-function createUser($firstName, $lastName, $email, $passwordHashed) {
+function createUser($firstName, $lastName, $email, $passwordHashed, $verificationToken) {
     global $conn;
     try {
-        $query = "INSERT INTO users (first_name, last_name, email, password, status) 
-                  VALUES (:first_name, :last_name, :email, :password, 1)";
+        $query = "INSERT INTO users (first_name, last_name, email, password, verification_token, status) 
+                  VALUES (:first_name, :last_name, :email, :password, :verification_token, 1)";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':first_name', $firstName, PDO::PARAM_STR);
         $stmt->bindParam(':last_name', $lastName, PDO::PARAM_STR);
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->bindParam(':password', $passwordHashed, PDO::PARAM_STR);
+        $stmt->bindParam(':verification_token', $verificationToken, PDO::PARAM_STR); // FIXED: Bound verification token parameter
         
         if ($stmt->execute()) {
             return $conn->lastInsertId();
