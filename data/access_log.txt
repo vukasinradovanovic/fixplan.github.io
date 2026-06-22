@@ -396,3 +396,9 @@
 [2026-06-22 11:02:54] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
 [2026-06-22 11:03:06] | IP: ::1 | Page: verification.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
 [2026-06-22 11:03:13] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:05:21] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:05:34] | IP: ::1 | Page: o_autoru.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:05:40] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:06:52] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-22 11:06:57] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
+[2026-06-22 11:07:33] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
