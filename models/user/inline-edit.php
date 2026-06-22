@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Call database transactional routine logic processing functions
     $result = updateUserInlineInDB($id, $firstName, $lastName, $email, $isVerified, $isLocked, $roleId);
 
     if ($result['success']) {

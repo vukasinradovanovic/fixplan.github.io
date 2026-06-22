@@ -18,19 +18,16 @@ function sendVerificationEmail($recipientEmail, $token, $recipientName): bool {
        $mail->CharSet = 'UTF-8';
         $mail->isSMTP();
         
-        // Fetch values safely from the $_ENV array
         $mail->Host       = $_ENV['MAIL_HOST'] ?? 'sandbox.smtp.mailtrap.io';
         $mail->SMTPAuth   = true;
         $mail->Username   = $_ENV['MAIL_USERNAME'] ?? ''; 
         $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? '';
         $mail->Port       = $_ENV['MAIL_PORT'] ?? 2525;
         
-        // Map encryption helper keyword dynamically
         if (isset($_ENV['MAIL_ENCRYPTION']) && $_ENV['MAIL_ENCRYPTION'] === 'tls') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         }
 
-        // Configuration mapping for sender identity
         $fromEmail = $_ENV['MAIL_FROM_ADDRESS'] ?? 'no-reply@fixplan.com';
         $fromName  = $_ENV['MAIL_FROM_NAME'] ?? 'FixPlan Platform';
         $mail->setFrom($fromEmail, $fromName);

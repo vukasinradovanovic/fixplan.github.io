@@ -402,3 +402,6 @@
 [2026-06-22 11:06:52] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
 [2026-06-22 11:06:57] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
 [2026-06-22 11:07:33] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-22 12:01:33] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-22 13:18:24] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-22 13:18:27] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost

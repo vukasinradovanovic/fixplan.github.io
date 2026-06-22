@@ -1,3 +1,6 @@
+# Link do sajta
+https://fixplan.infinityfree.io/ 
+
 # FixPlan Platforma - Lokalno Pokretanje Aplikacije
 
 Ovaj vodič sadrži detaljne korake za uspešno postavljanje i pokretanje aplikacije na Vašem lokalnom razvojnom okruženju koristeći **XAMPP** paket.
@@ -25,9 +28,10 @@ Aplikacija se obavezno mora nalaziti unutar glavnog direktorijuma za XAMPP web s
    C:\xampp\htdocs\fixplan-app
 ### Korak 2: Konfiguracija .env fajla
 
-Unutar config foldera se nalazi .env fajl koji je generički. U njemu se nalazi konfiguracija baze podataka i mailera.
-Ovde je primer kako on izgleda u koliko je neophodno da se opet napravi ili je došlo do greške
+Unutar config foldera se nalazi `.env` fajl koji je generički. U njemu se nalazi konfiguracija baze podataka i mailera.
+Ovde je primer kako on izgleda ukoliko je neophodno da se opet napravi ili je došlo do greške:
 
+```ini
 # Konfiguracija baze podataka
 DB_SERVER=127.0.0.1
 DB_PORT=3306 
