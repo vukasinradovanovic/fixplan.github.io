@@ -9,7 +9,6 @@ function writePageAccessLog() {
     $context = captureCurrentAccessContext();
     $logFilePath = dirname(__DIR__) . '/data/access_log.txt';
 
-    // Added Role parameter inside the tracking string template
     $logLine = "[{$context['timestamp']}] | IP: {$context['ip']} | Page: {$context['page']} | Role: {$context['role']} | Identity: {$context['user']}\n";
 
     try {
