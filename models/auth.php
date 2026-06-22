@@ -1,6 +1,8 @@
 <?php
-require_once dirname(__DIR__) . '/models/functions/auth.php';
-require_once dirname(__DIR__) . '/models/functions/mailer.php';
+// models/services/auth-service.php
+
+require_once dirname(__DIR__, 1) . '/models/functions/auth.php';
+require_once dirname(__DIR__, 1) . '/models/functions/mailer.php';
 
 /**
  * Pomoćna funkcija za validaciju email formata i dozvoljenih domena.
@@ -13,7 +15,7 @@ function isValidEmailDomain($email) {
 }
 
 /**
- * Logika za registraciju korisnika a validacijom i kreiranjem sesije.
+ * Logika za registraciju korisnika sa validacijom i kreiranjem sesije.
  * @param string $firstName
  * @param string $lastName
  * @param string $email
@@ -61,6 +63,7 @@ function registerUserLogic($firstName, $lastName, $email, $password) {
  */
 function loginUserLogic($email, $password) {
     $email = trim($email);
+    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 
     if (empty($email) || empty($password)) {
         return ["success" => false, "message" => "Unesite ispravne podatke za logovanje."];
@@ -75,12 +78,22 @@ function loginUserLogic($email, $password) {
         return ["success" => false, "message" => "Pogrešan email ili lozinka."];
     }
 
-    // Provera da li je nalog uspešno verifikovan preko email-a
+    // Provera da li je nalog uopšte aktivan na sistemu (status kontrola)
+    if (isset($user->status) && (int)$user->status === 0) {
+        return ["success" => false, "message" => "Vaš nalog je deaktiviran. Kontaktirajte administraciju."];
+    }
+
+    // 1. Provera da li je nalog zaključan
+    if (isset($user->is_locked) && (int)$user->is_locked === 1) {
+        return ["success" => false, "message" => "Ovaj nalog je privremeno zaključan zbog previše neuspešnih pokušaja. Proverite Vaš email."];
+    }
+
+    // 2. Provera da li je nalog verifikovan
     if (isset($user->is_verified) && (int)$user->is_verified === 0) {
         return ["success" => false, "message" => "Vaš nalog nije verifikovan. Molimo proverite vašu email adresu za aktivacioni link."];
     }
 
-    // Provera lozinke i inicijalizacija aktivne korisničke sesije
+    // 3. Provera lozinke
     if (password_verify($password, $user->password)) {
         $userRole = getUserRoleNameFromDB($user->id);
 
@@ -91,6 +104,17 @@ function loginUserLogic($email, $password) {
         $_SESSION['role']       = $userRole; 
         
         return ["success" => true, "message" => "Dobrodošli nazad!"];
+    }
+
+    // Ako lozinka nije tačna, beležimo neuspešan pokušaj
+    logFailedAttempt($email, $ipAddress);
+    
+    $failuresCount = countRecentFailures($email);
+    
+    if ($failuresCount >= 3) {
+        lockUserAccount($email);
+        sendAccountLockWarningEmail($email, $user->first_name);
+        return ["success" => false, "message" => "Previše neuspešnih pokušaja. Vaš nalog je zaključan, a sigurnosno obaveštenje je poslato na Vaš email."];
     }
 
     return ["success" => false, "message" => "Pogrešan email ili lozinka."];

@@ -48,7 +48,7 @@ $testData    = getServicesLogic(1, 100, null, 'name_asc');
     <div class="row g-4">
         
         <aside class="col-12 col-md-4 col-lg-3">
-            <div class="card shadow-sm border p-3 bg-light position-sticky" style="top: 20px;">
+            <div class="card shadow-sm border p-3 bg-light position-sticky " style="top: 100px;">
                 
                 <div class="mb-4">
                     <label for="searchServices" class="form-label fw-bold text-secondary">Pretraga</label>

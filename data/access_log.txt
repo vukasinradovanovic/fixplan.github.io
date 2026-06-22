@@ -323,3 +323,82 @@
 [2026-06-21 12:51:20] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
 [2026-06-21 12:51:23] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
 [2026-06-21 12:51:32] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 12 (milos@gmail.com)
+[2026-06-21 13:00:45] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 12 (milos@gmail.com)
+[2026-06-21 13:00:50] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 13:00:53] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
+[2026-06-21 13:01:19] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 13:01:29] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 13:01:33] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 13:01:41] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 13 (boki@gmail.com)
+[2026-06-21 13:50:09] | IP: ::1 | Page: usluge.php | Role: Gost | Identity: Gost
+[2026-06-21 14:08:50] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
+[2026-06-21 14:09:07] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 14:09:18] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 14:09:52] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 14:10:15] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 14:10:37] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 14:10:49] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 14:10:54] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 14:11:03] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 14:11:48] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 14:11:52] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 14:11:57] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 14:12:05] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 14:35:16] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 14:35:21] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
+[2026-06-21 14:35:37] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 14:35:48] | IP: ::1 | Page: verification.php | Role: Gost | Identity: Gost
+[2026-06-21 14:35:52] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 14:36:01] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 14:36:07] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 14:36:11] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 14:36:15] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 14:36:22] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 15:03:26] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 15:03:32] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 15:03:36] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 15:03:44] | IP: ::1 | Page: index.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 15:03:51] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 15:03:57] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 15:04:14] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 15:04:19] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 15:05:41] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-21 15:06:12] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-21 15:06:15] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-21 15:06:25] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 15:26:55] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 15:27:24] | IP: ::1 | Page: usluge.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 15:40:43] | IP: ::1 | Page: index.php | Role: Admin | Identity: Korisnik ID: 14 (admin@example.com)
+[2026-06-21 15:40:50] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-22 10:12:08] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost
+[2026-06-22 10:12:20] | IP: ::1 | Page: index.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:12:25] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:12:32] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:13:25] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:13:36] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:14:09] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:14:22] | IP: ::1 | Page: manage_service.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:14:54] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:15:03] | IP: ::1 | Page: index.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:15:11] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:19:09] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:19:29] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:20:26] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:20:58] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:21:22] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:22:03] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:22:16] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:22:27] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:22:38] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:22:56] | IP: ::1 | Page: usluge.php | Role: Radnik | Identity: Korisnik ID: 15 (milos@gmail.com)
+[2026-06-22 10:29:19] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-22 11:02:24] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
+[2026-06-22 11:02:54] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-22 11:03:06] | IP: ::1 | Page: verification.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:03:13] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:05:21] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:05:34] | IP: ::1 | Page: o_autoru.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:05:40] | IP: ::1 | Page: index.php | Role: Klijent | Identity: Korisnik ID: 16 (user@example.com)
+[2026-06-22 11:06:52] | IP: ::1 | Page: index.php | Role: Gost | Identity: Gost
+[2026-06-22 11:06:57] | IP: ::1 | Page: register.php | Role: Gost | Identity: Gost
+[2026-06-22 11:07:33] | IP: ::1 | Page: login.php | Role: Gost | Identity: Gost

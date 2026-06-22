@@ -16,6 +16,13 @@ $currentSubPage = isset($_GET['page']) ? trim($_GET['page']) : 'dashboard';
             </li>
 
             <li class="nav-item mb-2">
+                <a href="admin-dashboard.php?page=users"
+                    class="nav-link <?= $currentSubPage === 'users' ? 'active bg-primary text-white' : 'text-white-50 hover-link' ?>">
+                    <i class="fa-solid fa-users me-2"></i> Upravljanje Korisnicima
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
                 <a href="admin-dashboard.php?page=services"
                     class="nav-link <?= $currentSubPage === 'services' ? 'active bg-primary text-white' : 'text-white-50 hover-link' ?>">
                     <i class="fa-solid fa-screwdriver-wrench me-2"></i> Upravljanje Uslugama
