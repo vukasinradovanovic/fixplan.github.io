@@ -1,3 +1,6 @@
+# Link do sajta
+https://fixplan.infinityfree.io/ 
+
 # FixPlan Platforma - Lokalno Pokretanje Aplikacije
 
 Ovaj vodič sadrži detaljne korake za uspešno postavljanje i pokretanje aplikacije na Vašem lokalnom razvojnom okruženju koristeći **XAMPP** paket.
